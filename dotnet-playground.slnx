@@ -1,4 +1,4 @@
 <Solution>
-  <Project Path="PrimeService.Tests/PrimeService.Tests.csproj" />
-  <Project Path="PrimeService/PrimeService.csproj" />
+  <Project Path="Playground.Tests/Playground.Tests.csproj" />
+  <Project Path="Playground/Playground.csproj" />
 </Solution>
