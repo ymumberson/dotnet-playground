@@ -39,5 +39,20 @@ namespace StringCalculator.Tests
             // Assert
             Assert.Equal(expected, result);
         }
+
+        [Theory]
+        [InlineData("4/2", 2)]
+        [InlineData("63/9", 7)]
+        [InlineData("63/7", 9)]
+        [InlineData("0/2", 0)]
+        [InlineData("7245/21", 345)]
+        public void Calculate_WithDivide_ShouldDivideTwoNumbers(string input, int expected)
+        {
+            // Act
+            int result = _stringCalculatorService.Calculate(input);
+
+            // Assert
+            Assert.Equal(expected, result);
+        }
     }
 }
