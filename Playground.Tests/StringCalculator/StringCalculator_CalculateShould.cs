@@ -24,5 +24,20 @@ namespace StringCalculator.Tests
             // Assert
             Assert.Equal(expected, result);
         }
+
+        [Theory]
+        [InlineData("2*2", 4)]
+        [InlineData("7*9", 63)]
+        [InlineData("2*1", 2)]
+        [InlineData("0*2", 0)]
+        [InlineData("21*345", 7245)]
+        public void Calculate_WithMultiply_ShouldMultiplyTwoNumbers(string input, int expected)
+        {
+            // Act
+            int result = _stringCalculatorService.Calculate(input);
+
+            // Assert
+            Assert.Equal(expected, result);
+        }
     }
 }
