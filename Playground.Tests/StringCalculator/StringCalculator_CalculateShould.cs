@@ -63,5 +63,30 @@ namespace StringCalculator.Tests
                 () => _stringCalculatorService.Calculate("1/0")
             );
         }
+
+        [Theory]
+        [InlineData("1+")]
+        [InlineData("string")]
+        [InlineData("*3")]
+        public void Calculate_WithInvalidInput_ShouldThrowArgumentException(string input)
+        {
+            // Act & Assert
+            Assert.Throws<ArgumentException>(
+                () => _stringCalculatorService.Calculate(input)
+            );
+        }
+
+        [Theory]
+        [InlineData("2", 2)]
+        [InlineData("22", 22)]
+        [InlineData("4321", 4321)]
+        public void Calculate_WithSingleNumbers_ReturnsThatNumber(string input, int expected)
+        {
+            // Act
+            int result = _stringCalculatorService.Calculate(input);
+
+            // Assert
+            Assert.Equal(expected, result);
+        }
     }
 }

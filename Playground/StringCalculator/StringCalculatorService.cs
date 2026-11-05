@@ -10,19 +10,35 @@ namespace StringCalculator.Services
                 if (!Char.IsNumber(input[i])) break;
             }
 
-            int number1 = Int32.Parse(input.Substring(0, i));
+            if (!Int32.TryParse(input.Substring(0, i), out int number1))
+            {
+                throw new ArgumentException($"'{input}' is an invalid input");
+            }
 
-            if (i+1 >= input.Length) return number1;
+            if (i == input.Length)
+            {
+                if (Char.IsNumber(input[i-1]))
+                {
+                    return number1;
+                }
+                else
+                {
+                    throw new ArgumentException($"'{input}' is an invalid input");
+                }
+            }
 
             char operand = input[i];
 
-            int j = i+1;
+            int j;
             for (j=i+1; j<input.Length; ++j)
             {
                 if (!Char.IsNumber(input[j])) break;
             }
 
-            int number2 = Int32.Parse(input.Substring(i+1, (j - (i+1))));
+            if (!Int32.TryParse(input.Substring(i+1, (j - (i+1))), out int number2))
+            {
+                throw new ArgumentException($"'{input}' is an invalid input");
+            }
 
             switch (operand)
             {
@@ -34,7 +50,7 @@ namespace StringCalculator.Services
                     return number1 / number2;
             }
 
-            return 0;
+            throw new ArgumentException($"'{input}' is an invalid input");
         }
     }
 }
