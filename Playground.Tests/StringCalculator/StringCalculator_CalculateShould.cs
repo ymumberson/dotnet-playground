@@ -54,5 +54,14 @@ namespace StringCalculator.Tests
             // Assert
             Assert.Equal(expected, result);
         }
+
+        [Fact]
+        public void Calculate_WithDivisionByZero_ShouldThrowDivideByZeroException()
+        {
+            // Act & Assert
+            Assert.Throws<DivideByZeroException>(
+                () => _stringCalculatorService.Calculate("1/0")
+            );
+        }
     }
 }
