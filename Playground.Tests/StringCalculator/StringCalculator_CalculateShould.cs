@@ -88,5 +88,18 @@ namespace StringCalculator.Tests
             // Assert
             Assert.Equal(expected, result);
         }
+
+        [Theory]
+        [InlineData("1+(2*3)", 7)]
+        [InlineData("((3*(1+2))+42)", 51)]
+        [InlineData("(1+7)*(9/3)", 24)]
+        public void Calculate_WithParenthesis_ShouldResolveParenthisisFirst(string input, int expected)
+        {
+            // Act
+            int result = _stringCalculatorService.Calculate(input);
+
+            // Assert
+            Assert.Equal(expected, result);
+        }
     }
 }

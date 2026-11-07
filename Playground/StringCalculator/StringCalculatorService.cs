@@ -4,6 +4,9 @@ namespace StringCalculator.Services
     {
         public int Calculate(string input)
         {
+            input = ResolveParenthetis(input);
+
+            // Check for first number
             int i;
             for (i=0; i<input.Length; ++i)
             {
@@ -27,8 +30,12 @@ namespace StringCalculator.Services
                 }
             }
 
+
+            // Split operand
             char operand = input[i];
 
+
+            // Check for second number
             int j;
             for (j=i+1; j<input.Length; ++j)
             {
@@ -40,6 +47,7 @@ namespace StringCalculator.Services
                 throw new ArgumentException($"'{input}' is an invalid input");
             }
 
+            // Apply operand
             switch (operand)
             {
                 case '+':
@@ -51,6 +59,51 @@ namespace StringCalculator.Services
             }
 
             throw new ArgumentException($"'{input}' is an invalid input");
+        }
+
+        private string ResolveParenthetis(string input)
+        {
+            int openBracketIndex = -1;
+            for (int i=0; i<input.Length-1; ++i)
+            {
+                if (input[i] == '(')
+                {
+                    openBracketIndex = i;
+                    break;
+                }
+            }
+
+            if (openBracketIndex == -1) return input;
+
+            int closeBracketIndex = -1;
+            int numUnresolvedBrackets = 0;
+            for (int i=openBracketIndex+1; i<input.Length; ++i)
+            {
+                if (input[i] == '(')
+                {
+                    numUnresolvedBrackets++;
+                }
+                else if (input[i] == ')')
+                {
+                    if (numUnresolvedBrackets == 0)
+                    {
+                        closeBracketIndex = i;
+                        break;
+                    }
+                    numUnresolvedBrackets--;
+                }
+            }
+
+            if (closeBracketIndex == -1) return input;
+
+            string parenthetis = Calculate(input.Substring(openBracketIndex+1, closeBracketIndex - openBracketIndex)).ToString();
+            string output = input.Substring(0, openBracketIndex) + parenthetis;
+            if (closeBracketIndex < input.Length-1)
+            {
+                output += input.Substring(closeBracketIndex+1, input.Length-1 - closeBracketIndex);
+            }
+
+            return ResolveParenthetis(output);
         }
     }
 }
