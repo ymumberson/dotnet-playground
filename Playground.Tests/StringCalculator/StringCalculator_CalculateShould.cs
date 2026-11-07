@@ -114,5 +114,19 @@ namespace StringCalculator.Tests
             // Assert
             Assert.Equal(expected, result);
         }
+
+        [Theory]
+        [InlineData("-1 * 3", -3)]
+        [InlineData("2*-3", -6)]
+        // [InlineData("-3-3", -6)]
+        [InlineData("-10+-12", -22)]
+        public void Calculate_WithNegativeNumbers_ShouldHandleNegativeNumbers(string input, int expected)
+        {
+            // Act
+            int result = _stringCalculatorService.Calculate(input);
+
+            // Assert
+            Assert.Equal(expected, result);
+        }
     }
 }

@@ -17,8 +17,12 @@ namespace StringCalculator.Services
             input = ResolveParenthetis(input);
 
             // Check for first number
-            int i;
-            for (i=0; i<input.Length; ++i)
+            int i = 0;
+            if (i >= input.Length || (input[i] != '-' && !Char.IsNumber(input[i])))
+            {
+                throw new ArgumentException($"'{input}' is an invalid input");
+            }
+            for (i=1; i<input.Length; ++i)
             {
                 if (!Char.IsNumber(input[i])) break;
             }
@@ -46,8 +50,12 @@ namespace StringCalculator.Services
 
 
             // Check for second number
-            int j;
-            for (j=i+1; j<input.Length; ++j)
+            int j = i+1;
+            if (j >= input.Length || (input[j] != '-' && !Char.IsNumber(input[j])))
+            {
+                throw new ArgumentException($"'{input}' is an invalid input");
+            }
+            for (j=i+2; j<input.Length; ++j)
             {
                 if (!Char.IsNumber(input[j])) break;
             }
