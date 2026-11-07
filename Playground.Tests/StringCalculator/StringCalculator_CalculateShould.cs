@@ -1,3 +1,4 @@
+using System.Diagnostics;
 using StringCalculator.Services;
 
 namespace StringCalculator.Tests
@@ -141,6 +142,21 @@ namespace StringCalculator.Tests
 
             // Assert
             Assert.Equal(expected, result);
+        }
+
+        [Fact]
+        public void Calculate_WithLargeInput_CalculatesCorrectly()
+        {
+            const int INPUT_SIZE = 100;
+
+            // Arrange
+            string input = string.Join("+", Enumerable.Repeat("(1+1)", INPUT_SIZE));
+
+            // Act
+            int result = _stringCalculatorService.Calculate(input);
+
+            // Assert
+            Assert.Equal(INPUT_SIZE*2, result);
         }
     }
 }

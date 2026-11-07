@@ -66,19 +66,34 @@ namespace StringCalculator.Services
             }
 
             // Apply operand
+            int result = 0;
             switch (operand)
             {
                 case '+':
-                    return number1 + number2;
+                    result = number1 + number2;
+                    break;
                 case '*':
-                    return number1 * number2;
+                    result = number1 * number2;
+                    break;
                 case '/':
-                    return number1 / number2;
+                    result = number1 / number2;
+                    break;
                 case '-':
-                    return number1 - number2;
+                    result = number1 - number2;
+                    break;
+                default:
+                    throw new ArgumentException($"'{input}' is an invalid input: {operand} is not supported");
             }
 
-            throw new ArgumentException($"'{input}' is an invalid input: {operand} is not supported");
+            if (j >= input.Length-1)
+            {
+                return result;
+            }
+            else
+            {
+                string newInput = result.ToString() + input.Substring(j, input.Length - j);
+                return CalculateWithWhiteSpaceRemoved(newInput);
+            }
         }
 
         private string ResolveParenthetis(string input)
