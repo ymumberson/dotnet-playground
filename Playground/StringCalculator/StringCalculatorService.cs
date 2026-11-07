@@ -74,9 +74,11 @@ namespace StringCalculator.Services
                     return number1 * number2;
                 case '/':
                     return number1 / number2;
+                case '-':
+                    return number1 - number2;
             }
 
-            throw new ArgumentException($"'{input}' is an invalid input");
+            throw new ArgumentException($"'{input}' is an invalid input: {operand} is not supported");
         }
 
         private string ResolveParenthetis(string input)
