@@ -101,5 +101,18 @@ namespace StringCalculator.Tests
             // Assert
             Assert.Equal(expected, result);
         }
+
+        [Theory]
+        [InlineData("1 + 1", 2)]
+        [InlineData("1 / 1", 1)]
+        [InlineData("2 * (3+3)", 12)]
+        public void Calculate_WithWhiteSpace_ShouldIgnoreWhiteSpace(string input, int expected)
+        {
+            // Act
+            int result = _stringCalculatorService.Calculate(input);
+
+            // Assert
+            Assert.Equal(expected, result);
+        }
     }
 }

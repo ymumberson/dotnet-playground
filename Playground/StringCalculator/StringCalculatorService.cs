@@ -4,6 +4,16 @@ namespace StringCalculator.Services
     {
         public int Calculate(string input)
         {
+            return CalculateWithWhiteSpaceRemoved(RemoveWhiteSpace(input));
+        }
+        
+        private string RemoveWhiteSpace(string input)
+        {
+            return new string([.. input.Where(c => !Char.IsWhiteSpace(c))]);
+        }
+
+        private int CalculateWithWhiteSpaceRemoved(string input)
+        {
             input = ResolveParenthetis(input);
 
             // Check for first number
@@ -96,7 +106,7 @@ namespace StringCalculator.Services
 
             if (closeBracketIndex == -1) return input;
 
-            string parenthetis = Calculate(input.Substring(openBracketIndex+1, closeBracketIndex - openBracketIndex)).ToString();
+            string parenthetis = CalculateWithWhiteSpaceRemoved(input.Substring(openBracketIndex+1, closeBracketIndex - openBracketIndex)).ToString();
             string output = input.Substring(0, openBracketIndex) + parenthetis;
             if (closeBracketIndex < input.Length-1)
             {
