@@ -158,5 +158,11 @@ namespace StringCalculator.Tests
             // Assert
             Assert.Equal(INPUT_SIZE*2, result);
         }
+
+        // TODO tests (Not in order):
+        // 1) Benchmarks / completes in a reasonable time
+        // 2) Respects BIDMAS
+        // 3) Works with floating point
+        // 4) Handles sin, cosin, cos, tan etc.
     }
 }
