@@ -1,144 +1,218 @@
+using System.ComponentModel;
+using System.Text;
+
 namespace StringCalculator.Services
 {
     public class StringCalculatorService
     {
+        private List<Token> _tokens = new();
+        private int _position = 0;
+
+        private Token Current => _position < _tokens.Count ? _tokens[_position] : throw new ArgumentException("Unexpected end of expression.");
+        
         public int Calculate(string input)
         {
-            return CalculateWithWhiteSpaceRemoved(RemoveWhiteSpace(input));
+            _tokens = TokeniseInput(input);
+            _position = 0;
+
+            int result = Calculate();
+
+            if (_position != _tokens.Count)
+                throw new ArgumentException("Unexpected token.");
+
+            return result;
         }
-        
-        private string RemoveWhiteSpace(string input)
+
+        private int Calculate()
         {
-            return new string([.. input.Where(c => !Char.IsWhiteSpace(c))]);
-        }
+            int result = ParseTerm();
 
-        private int CalculateWithWhiteSpaceRemoved(string input)
-        {
-            input = ResolveParenthetis(input);
-
-            // Check for first number
-            int i = 0;
-            if (i >= input.Length || (input[i] != '-' && !Char.IsNumber(input[i])))
+            while (true)
             {
-                throw new ArgumentException($"'{input}' is an invalid input");
-            }
-            for (i=1; i<input.Length; ++i)
-            {
-                if (!Char.IsNumber(input[i])) break;
-            }
-
-            if (!Int32.TryParse(input.Substring(0, i), out int number1))
-            {
-                throw new ArgumentException($"'{input}' is an invalid input");
-            }
-
-            if (i == input.Length)
-            {
-                if (Char.IsNumber(input[i-1]))
+                if (Match(TokenType.Plus))
                 {
-                    return number1;
+                    result += ParseTerm();
+                }
+                else if (Match(TokenType.Minus))
+                {
+                    result -= ParseTerm();
                 }
                 else
                 {
-                    throw new ArgumentException($"'{input}' is an invalid input");
+                    break;
+                }
+            }
+            return result;
+        }
+
+        private Token Consume()
+        {
+            return _tokens[_position++];
+        }
+
+        private bool Match(TokenType type)
+        {
+            if (_position >= _tokens.Count || _tokens[_position].token != type) return false;
+
+            _position++;
+            return true;
+        }
+
+        private int ParseTerm()
+        {
+            int result = ParseFactor();
+
+            while (true)
+            {
+                if (Match(TokenType.Multiply))
+                {
+                    result *= ParseFactor();
+                }
+                else if (Match(TokenType.Divide))
+                {
+                    int divisor = ParseFactor();
+
+                    if (divisor == 0)
+                        throw new DivideByZeroException();
+                    
+                    result /= divisor;
+                }
+                else
+                {
+                    break;
                 }
             }
 
+            return result;
+        }
 
-            // Split operand
-            char operand = input[i];
-
-
-            // Check for second number
-            int j = i+1;
-            if (j >= input.Length || (input[j] != '-' && !Char.IsNumber(input[j])))
+        private int ParseFactor()
+        {
+            if (Match(TokenType.Number))
             {
-                throw new ArgumentException($"'{input}' is an invalid input");
-            }
-            for (j=i+2; j<input.Length; ++j)
-            {
-                if (!Char.IsNumber(input[j])) break;
+                return (int)_tokens[_position-1].Value;
             }
 
-            if (!Int32.TryParse(input.Substring(i+1, (j - (i+1))), out int number2))
+            if (Match(TokenType.OpenBracket))
             {
-                throw new ArgumentException($"'{input}' is an invalid input");
-            }
+                int result = Calculate();
 
-            // Apply operand
-            int result = 0;
-            switch (operand)
-            {
-                case '+':
-                    result = number1 + number2;
-                    break;
-                case '*':
-                    result = number1 * number2;
-                    break;
-                case '/':
-                    result = number1 / number2;
-                    break;
-                case '-':
-                    result = number1 - number2;
-                    break;
-                default:
-                    throw new ArgumentException($"'{input}' is an invalid input: {operand} is not supported");
-            }
-
-            if (j >= input.Length)
-            {
+                if (!Match(TokenType.CloseBracket))
+                    throw new ArgumentException("Missing closing bracket.");
+                
                 return result;
             }
-            else
+
+            throw new ArgumentException("Expected a number or opening bracket.");
+        }
+        
+        private List<Token> TokeniseInput(string input)
+        {
+            List<Token> tokens = new();
+
+            int start = 0;
+            bool previousCharWasOperator = false;
+            bool previousCharWasNumber = false;
+            for (int i=0; i<input.Length; ++i)
             {
-                string newInput = result.ToString() + input.Substring(j, input.Length - j);
-                return CalculateWithWhiteSpaceRemoved(newInput);
+                if (Char.IsNumber(input[i]) || ((previousCharWasOperator || i == 0) && input[i] == '-'))
+                {
+                    previousCharWasOperator = false;
+                    previousCharWasNumber = true;
+
+                    if (i == input.Length-1)
+                    {
+                        Double num = Double.Parse(input.Substring(start, i-start + 1));
+                        tokens.Add(new Token(TokenType.Number, num));
+                    }
+                }
+                else
+                {
+                    if (previousCharWasNumber)
+                    {
+                        Double num = Double.Parse(input.Substring(start, i-start));
+                        tokens.Add(new Token(TokenType.Number, num));
+                    }
+                    
+                    switch (input[i])
+                    {
+                        case '+':
+                            tokens.Add(new Token(TokenType.Plus));
+                            break;
+                        case '-':
+                            tokens.Add(new Token(TokenType.Minus));
+                            break;
+                        case '/':
+                            tokens.Add(new Token(TokenType.Divide));
+                            break;
+                        case '*':
+                            tokens.Add(new Token(TokenType.Multiply));
+                            break;
+                        case '(':
+                            tokens.Add(new Token(TokenType.OpenBracket));
+                            break;
+                        case ')':
+                            tokens.Add(new Token(TokenType.CloseBracket));
+                            break;
+                        case ' ':
+                            break;
+                        default:
+                            throw new ArgumentException($"'{input}' is not a valid input.");
+                    }
+                    previousCharWasOperator = true;
+                    previousCharWasNumber = false;
+                    start = i+1;
+                }
             }
+
+            return tokens;
         }
 
-        private string ResolveParenthetis(string input)
+        private string TokensToString(List<Token> tokens)
         {
-            int openBracketIndex = -1;
-            for (int i=0; i<input.Length-1; ++i)
+            StringBuilder str = new();
+            foreach(Token t in tokens)
             {
-                if (input[i] == '(')
+                switch (t.token)
                 {
-                    openBracketIndex = i;
-                    break;
-                }
-            }
-
-            if (openBracketIndex == -1) return input;
-
-            int closeBracketIndex = -1;
-            int numUnresolvedBrackets = 0;
-            for (int i=openBracketIndex+1; i<input.Length; ++i)
-            {
-                if (input[i] == '(')
-                {
-                    numUnresolvedBrackets++;
-                }
-                else if (input[i] == ')')
-                {
-                    if (numUnresolvedBrackets == 0)
-                    {
-                        closeBracketIndex = i;
+                    case TokenType.Number:
+                        str.Append(t.Value);
                         break;
-                    }
-                    numUnresolvedBrackets--;
+                    case TokenType.Plus:
+                        str.Append('+');
+                        break;
+                    case TokenType.Minus:
+                        str.Append('-');
+                        break;
+                    case TokenType.Multiply:
+                        str.Append('*');
+                        break;
+                    case TokenType.Divide:
+                        str.Append('/');
+                        break;
+                    case TokenType.OpenBracket:
+                        str.Append('(');
+                        break;
+                    case TokenType.CloseBracket:
+                        str.Append(')');
+                        break;
                 }
+                str.Append(',');
             }
-
-            if (closeBracketIndex == -1) return input;
-
-            string parenthetis = CalculateWithWhiteSpaceRemoved(input.Substring(openBracketIndex+1, closeBracketIndex - openBracketIndex - 1)).ToString();
-            string output = input.Substring(0, openBracketIndex) + parenthetis;
-            if (closeBracketIndex < input.Length)
-            {
-                output += input.Substring(closeBracketIndex+1, input.Length-1 - closeBracketIndex);
-            }
-
-            return ResolveParenthetis(output);
+            return str.ToString();
         }
     }
+
+    public enum TokenType
+    {
+        Number,
+        Plus,
+        Minus,
+        Multiply,
+        Divide,
+        OpenBracket,
+        CloseBracket
+    }
+
+    public record Token(TokenType token, double Value = 0);
 }
