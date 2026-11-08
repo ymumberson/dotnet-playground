@@ -83,6 +83,7 @@ namespace StringCalculator.Tests
         [InlineData("1+")]
         [InlineData("string")]
         [InlineData("*3")]
+        [InlineData("1+1*")]
         public void Calculate_WithInvalidInput_ShouldThrowArgumentException(string input)
         {
             // Act & Assert
@@ -164,5 +165,6 @@ namespace StringCalculator.Tests
         // 2) Respects BIDMAS
         // 3) Works with floating point
         // 4) Handles sin, cosin, cos, tan etc.
+        // 5) Correct terminology of operand and operator (Currently wrong way around)
     }
 }

@@ -85,7 +85,7 @@ namespace StringCalculator.Services
                     throw new ArgumentException($"'{input}' is an invalid input: {operand} is not supported");
             }
 
-            if (j >= input.Length-1)
+            if (j >= input.Length)
             {
                 return result;
             }
@@ -131,9 +131,9 @@ namespace StringCalculator.Services
 
             if (closeBracketIndex == -1) return input;
 
-            string parenthetis = CalculateWithWhiteSpaceRemoved(input.Substring(openBracketIndex+1, closeBracketIndex - openBracketIndex)).ToString();
+            string parenthetis = CalculateWithWhiteSpaceRemoved(input.Substring(openBracketIndex+1, closeBracketIndex - openBracketIndex - 1)).ToString();
             string output = input.Substring(0, openBracketIndex) + parenthetis;
-            if (closeBracketIndex < input.Length-1)
+            if (closeBracketIndex < input.Length)
             {
                 output += input.Substring(closeBracketIndex+1, input.Length-1 - closeBracketIndex);
             }
