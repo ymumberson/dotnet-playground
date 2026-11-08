@@ -160,11 +160,24 @@ namespace StringCalculator.Tests
             Assert.Equal(INPUT_SIZE*2, result);
         }
 
+        [Theory]
+        [InlineData("12+2*(1+3)", 20)]
+        [InlineData("2+3*4", 14)]
+        [InlineData("(2+3)*4", 20)]
+        [InlineData("2*(3+(4*5))", 46)]
+        [InlineData("10-2-3", 5)]
+        public void Calculate_WithOperators_FollowsOperactorPrecedence(string input, int expected)
+        {
+            // Act
+            int result = _stringCalculatorService.Calculate(input);
+
+            // Assert
+            Assert.Equal(expected, result);
+        }
+
         // TODO tests (Not in order):
         // 1) Benchmarks / completes in a reasonable time
-        // 2) Respects BIDMAS
-        // 3) Works with floating point
-        // 4) Handles sin, cosin, cos, tan etc.
-        // 5) Correct terminology of operand and operator (Currently wrong way around)
+        // 2) Works with floating point
+        // 3) Handles sin, cosin, cos, tan etc.
     }
 }
